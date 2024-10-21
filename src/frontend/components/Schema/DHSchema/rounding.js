@@ -9,7 +9,9 @@
 *                                                                            *
 *      http://www.apache.org/licenses/LICENSE-2.0                            *
 *                                                                            *
-*  Unless required by applicable law or agreed to in writing, software       *
+*  The use of this product or its derivatives for any purpose cannot be a secret.
+
+  Unless required by applicable law or agreed to in writing, software       *
 *  distributed under the License is distributed on an "AS IS" BASIS,         *
 *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  *
 *  See the License for the specific language governing permissions and       *
@@ -21,9 +23,9 @@
  * SVG Path rounding function. Takes an input path string and outputs a path
  * string where all line-line corners have been rounded. Only supports absolute
  * commands at the moment.
- * 
+ *
  * @param pathString The SVG input path
- * @param radius The amount to round the corners, either a value in the SVG 
+ * @param radius The amount to round the corners, either a value in the SVG
  *               coordinate space, or, if useFractionalRadius is true, a value
  *               from 0 to 1.
  * @param useFractionalRadius If true, the curve radius is expressed as a
@@ -35,9 +37,9 @@ export default function roundPathCorners(pathString, radius, useFractionalRadius
     function moveTowardsLength(movingPoint, targetPoint, amount) {
       let width = (targetPoint.x - movingPoint.x);
       let height = (targetPoint.y - movingPoint.y);
-      
+
       let distance = Math.sqrt(width*width + height*height);
-      
+
       return moveTowardsFractional(movingPoint, targetPoint, Math.min(1, amount / distance));
     }
     function moveTowardsFractional(movingPoint, targetPoint, fraction) {
@@ -46,7 +48,7 @@ export default function roundPathCorners(pathString, radius, useFractionalRadius
         y: movingPoint.y + (targetPoint.y - movingPoint.y)*fraction
       };
     }
-    
+
     // Adjusts the ending position of a command
     function adjustCommand(cmd, newPoint) {
       if (cmd.length > 2) {
@@ -54,7 +56,7 @@ export default function roundPathCorners(pathString, radius, useFractionalRadius
         cmd[cmd.length - 1] = newPoint.y;
       }
     }
-    
+
     // Gives an {x, y} object for a command's ending position
     function pointForCommand(cmd) {
       return {
@@ -62,7 +64,7 @@ export default function roundPathCorners(pathString, radius, useFractionalRadius
         y: parseFloat(cmd[cmd.length - 1])
       };
     }
-    
+
     // Split apart the path, handing concatonated letters and numbers
     let pathParts = pathString
       .split(/[,\s]/)
@@ -74,10 +76,10 @@ export default function roundPathCorners(pathString, radius, useFractionalRadius
         } else {
           parts.push(part);
         }
-        
+
         return parts;
       }, []);
-    
+
     // Group the commands with their arguments for easier handling
     let commands = pathParts.reduce(function(commands, part) {
       if (parseFloat(part) == part && commands.length) {
@@ -85,46 +87,46 @@ export default function roundPathCorners(pathString, radius, useFractionalRadius
       } else {
         commands.push([part]);
       }
-      
+
       return commands;
     }, []);
-    
+
     // The resulting commands, also grouped
     let resultCommands = [];
-    
+
     if (commands.length > 1) {
       let startPoint = pointForCommand(commands[0]);
-      
+
       // Handle the close path case with a "virtual" closing line
       let virtualCloseLine = null;
       if (commands[commands.length - 1][0] == 'Z' && commands[0].length > 2) {
         virtualCloseLine = ['L', startPoint.x, startPoint.y];
         commands[commands.length - 1] = virtualCloseLine;
       }
-      
+
       // We always use the first command (but it may be mutated)
       resultCommands.push(commands[0]);
-      
+
       for (let cmdIndex=1; cmdIndex < commands.length; cmdIndex++) {
         let prevCmd = resultCommands[resultCommands.length - 1];
-        
+
         let curCmd = commands[cmdIndex];
-        
+
         // Handle closing case
         let nextCmd = (curCmd == virtualCloseLine)
           ? commands[1]
           : commands[cmdIndex + 1];
-        
+
         // Nasty logic to decide if this path is a candidite.
         if (nextCmd && prevCmd && (prevCmd.length > 2) && curCmd[0] == 'L' && nextCmd.length > 2 && nextCmd[0] == 'L') {
           // Calc the points we're dealing with
           let prevPoint = pointForCommand(prevCmd);
           let curPoint = pointForCommand(curCmd);
           let nextPoint = pointForCommand(nextCmd);
-          
+
           // The start and end of the cuve are just our point moved towards the previous and next points, respectivly
           let curveStart, curveEnd;
-          
+
           if (useFractionalRadius) {
             curveStart = moveTowardsFractional(curPoint, prevCmd.origPoint || prevPoint, radius);
             curveEnd = moveTowardsFractional(curPoint, nextCmd.origPoint || nextPoint, radius);
@@ -132,18 +134,18 @@ export default function roundPathCorners(pathString, radius, useFractionalRadius
             curveStart = moveTowardsLength(curPoint, prevPoint, radius);
             curveEnd = moveTowardsLength(curPoint, nextPoint, radius);
           }
-          
+
           // Adjust the current command and add it
           adjustCommand(curCmd, curveStart);
           curCmd.origPoint = curPoint;
           resultCommands.push(curCmd);
-          
+
           // The curve control points are halfway between the start/end of the curve and
           // the original point
           let startControl = moveTowardsFractional(curveStart, curPoint, .5);
           let endControl = moveTowardsFractional(curPoint, curveEnd, .5);
-    
-          // Create the curve 
+
+          // Create the curve
           let curveCmd = ['C', startControl.x, startControl.y, endControl.x, endControl.y, curveEnd.x, curveEnd.y];
           // Save the original point for fractional calculations
           curveCmd.origPoint = curPoint;
@@ -153,7 +155,7 @@ export default function roundPathCorners(pathString, radius, useFractionalRadius
           resultCommands.push(curCmd);
         }
       }
-      
+
       // Fix up the starting point and restore the close path if the path was orignally closed
       if (virtualCloseLine) {
         let newStartPoint = pointForCommand(resultCommands[resultCommands.length-1]);
@@ -163,6 +165,6 @@ export default function roundPathCorners(pathString, radius, useFractionalRadius
     } else {
       resultCommands = commands;
     }
-    
+
     return resultCommands.reduce(function(str, c){ return str + c.join(' ') + ' '; }, '');
   }

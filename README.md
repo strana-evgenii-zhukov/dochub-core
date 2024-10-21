@@ -59,12 +59,17 @@ gantt
         POC mutators                :done, 2023-07-01, 150d
     section Q4 2023
         Framework SEAF              :done, 2023-10-01, 92d
-        Time Machine                :active, 2023-11-01, 250d
-        Public metamodel repository :active, 2023-10-01, 200d
+        Public metamodel repository :done, 2023-10-01, 200d
     section Q2 2024
-        MVP mutators                :active, 2024-01-01, 200d
-        Process Disigner tool       :2024-06-01, 90d
-        Architectire Commutiny tool :2024-06-01, 90d
+        MVP mutators                :done, 2024-01-01, 200d
+        Process Disigner tool       :done, 2024-06-01, 120d
+        Architectire Commutiny tool :2024-06-01, 200d
+    section Q3 2024
+        AaaC Community Architect Framework (CEAF)   :active, 2024-06-17, 200d
+        WEB DocHub IDE                              :active, 2024-09-14, 120d
+        Digital Modeler                             :active, 2024-09-14, 120d
+    section Q4 2024
+        Time Machine                :active, 2024-11-01, 90d
 
 click plugins href "https://dochub.info/docs/dochub.plugins.intro"
 click smartants href "https://dochub.info/docs/dochub.smartants"

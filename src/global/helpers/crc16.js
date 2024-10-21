@@ -1,3 +1,32 @@
+  /*
+  Copyright (C) 2021 owner Roman Piontik R.Piontik@mail.ru
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+  In any derivative products, you must retain the information of
+  owner of the original code and provide clear attribution to the project
+
+          https://dochub.info
+
+  The use of this product or its derivatives for any purpose cannot be a secret.
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+  Maintainers:
+      R.Piontik <r.piontik@mail.ru>
+
+  Contributors:
+      R.Piontik <r.piontik@mail.ru>
+  */
+
 const crcTable = [0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5,
 	0x60c6, 0x70e7, 0x8108, 0x9129, 0xa14a, 0xb16b,
 	0xc18c, 0xd1ad, 0xe1ce, 0xf1ef, 0x1231, 0x0210,
@@ -42,7 +71,7 @@ const crcTable = [0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5,
 	0x8fd9, 0x9ff8, 0x6e17, 0x7e36, 0x4e55, 0x5e74,
 	0x2e93, 0x3eb2, 0x0ed1, 0x1ef0];
 
-/*	
+/*
 export default function(str)  {
 	let crc = 0xFFFF;
 	let j, i;
