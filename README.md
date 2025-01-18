@@ -2,8 +2,6 @@
 
 ![Инкрементальное развитие архитектуры](pics/interface.png)
 
-![GitHub License](https://img.shields.io/github/license/rabotaru/dochub)
-
 DocHub - инструмент описания архитектуры через код (Architecture as a code). Код архитектуры - ансамбль файлов на языках,
 решающих задачу описания. Поддерживаются:
 
@@ -54,25 +52,29 @@ gantt
         Export to Excalidraw         :done, exportexc, 2023-02-20, 11d
         Backend                      :done, 2023-02-27, 30d
     section Q2 2023
-        PoC revers architecture tool    :done, 2023-04-01, 180d
-        PoC event storming tool         :done, 2023-04-01, 90d
+        PoC revers architecture tool :done, 2023-04-01, 180d
+        PoC event storming tool      :done, 2023-04-01, 90d
     section Q3 2023
-        Iaas reverce tool           :done, 2023-07-01, 92d
-        MVP Framework SEAF          :done, 2023-07-01, 92d
-        POC mutators                :done, 2023-07-01, 150d
+        MVP Framework SEAF           :done, 2023-07-01, 92d
+        POC mutators                 :done, 2023-07-01, 150d
     section Q4 2023
-        Framework SEAF              :done, 2023-10-01, 92d
-        Public metamodel repository :done, 2023-10-01, 200d
+        Framework SEAF               :done, 2023-10-01, 92d
+        Public metamodel repository  :done, 2023-10-01, 200d
     section Q2 2024
-        MVP mutators                :done, 2024-01-01, 200d
-        Process Disigner tool       :done, 2024-06-01, 120d
-        Architectire Commutiny tool :2024-06-01, 200d
+        MVP mutators                 :done, 2024-01-01, 200d
+        Process Disigner tool (BPMN) :done, 2024-06-01, 120d
+        Architectire Commutiny tool  :2024-06-01, 300d
     section Q3 2024
-        AaaC Community Architect Framework (CEAF)   :active, 2024-06-17, 200d
-        WEB DocHub IDE                              :active, 2024-09-14, 120d
-        Digital Modeler                             :active, 2024-09-14, 120d
+        AaaC Community Architect Framework (CEAF)   :active, 2024-06-17, 550d
+        WEB DocHub IDE                              :active, 2024-09-14, 150d
+        SaaS version                                :active, 2024-11-01, 130d
     section Q4 2024
-        Time Machine                :active, 2024-11-01, 90d
+        Digital Modeler                             :active, 2024-12-14, 365d
+        Time Machine                :active, 2024-11-01, 250d
+    section Q1 2025
+        User form editor                            :active, 2025-01-08, 60d
+        ArchiMate modeler                           :active, 2025-03-15, 60d
+
 
 click plugins href "https://dochub.info/docs/dochub.plugins.intro"
 click smartants href "https://dochub.info/docs/dochub.smartants"
@@ -305,7 +307,8 @@ npm run build
 
 Каждая [звезда DocHub](#), это камень в фундамент подхода "Архитектура как код"!
  
-[![Звезды на GitHub](https://starchart.cc/RabotaRu/DocHub.svg?variant=adaptive)](https://starchart.cc/RabotaRu/DocHub)
+ ## Stargazers over time
+[![Звезды на GitHub](https://starchart.cc/DocHubTeam/DocHub.svg?variant=adaptive)](https://starchart.cc/DocHubTeam/DocHub)
 
 # Лицензия
 DocHub распространяется под лицензией Apache License 2.0 Open source license.
