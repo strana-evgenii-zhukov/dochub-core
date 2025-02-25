@@ -158,9 +158,9 @@ export default (queryDriver, functions) => {
             !func.validators && makeValidators(func);
             const input = prepareParams(func, params);  // Подготавливаем параметры и проверяем их на корректность
             let doRebuildQuery = !func.executor;
-            if (!doRebuildQuery || input.funcs || func.funcs) {
+            if (!doRebuildQuery || input?.funcs || func.funcs) {
                 const oldFuncs = Object.assign({}, func.funcs || {});
-                for (const funcId in input.funcs) {
+                for (const funcId in input?.funcs || {}) {
                     if (input.funcs[funcId] !== oldFuncs[funcId]) {
                         doRebuildQuery = true;
                         break;
@@ -178,7 +178,7 @@ export default (queryDriver, functions) => {
                     input?.funcs
                 );
             }
-            const result = await func.executor.evaluate(input.context);
+            const result = await func.executor.evaluate(input?.context);
             func.funcs = input.funcs;
             return prepareResult(func, result);         // Проверяем результат на корректность
         };
