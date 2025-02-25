@@ -1,3 +1,20 @@
+<template>
+  <div v-bind:style="placeHolderStyle">
+    <doc
+      v-if="!isParamsInvalid && !refresh"
+      v-bind:path="presentationPath"
+      v-bind:params="entityParams"
+      v-bind:context-menu="toSwitchPres" />
+    <v-alert v-if="isParamsInvalid && profileLoaded" type="error" v-bind:value="true" style="white-space: pre-wrap;">
+      Сущность: {{ entity }}<br>
+      Представление: {{ presentation }}<br>
+      {{ isParamsInvalid.name }}:<br>
+      {{ isParamsInvalid.error }}
+    </v-alert>
+  </div>
+</template>
+
+<script>
   /*
   Copyright (C) 2021 owner Roman Piontik R.Piontik@mail.ru
 
@@ -27,25 +44,7 @@
       R.Piontik <r.piontik@mail.ru>
       clayzenx <clay.zenx@gmail.com>
   */
-
-
-<template>
-  <div v-bind:style="placeHolderStyle">
-    <doc
-      v-if="!isParamsInvalid && !refresh"
-      v-bind:path="presentationPath"
-      v-bind:params="entityParams"
-      v-bind:context-menu="toSwitchPres" />
-    <v-alert v-if="isParamsInvalid && profileLoaded" type="error" v-bind:value="true" style="white-space: pre-wrap;">
-      Сущность: {{ entity }}<br>
-      Представление: {{ presentation }}<br>
-      {{ isParamsInvalid.name }}:<br>
-      {{ isParamsInvalid.error }}
-    </v-alert>
-  </div>
-</template>
-
-<script>
+ 
   import ajv from 'ajv';
   const ajv_localize = require('ajv-i18n/localize/ru');
 
