@@ -30,10 +30,9 @@ import config from './config.json';
 import { TCacheData } from '../types/idb.types';
 
 async function storeName() {
-  const user = await window['OidcUserManager'].getUser();
+  //const user = await window['OidcUserManager']?.getUser();
   // eslint-disable-next-line no-console
-  console.log(user?.profile?.roles);
-
+  //console.log(user?.profile?.roles);
   return env.rootManifest || 'dochub';
 }
 
