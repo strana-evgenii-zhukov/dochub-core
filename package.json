@@ -7,12 +7,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RabotaRu/DocHub.git"
+    "url": "git+https://github.com/DocHubTeam/DocHub.git"
   },
   "bugs": {
-    "url": "https://github.com/RabotaRu/DocHub/issues"
+    "url": "https://github.com/DocHubTeam/DocHub/issues"
   },
-  "homepage": "https://github.com/RabotaRu/DocHub#readme",
+  "homepage": "https://github.com/DocHubTeam/DocHub#readme",
   "scripts": {
     "lib": "vue-cli-service build --name test --target lib",
     "plugin": "export VUE_APP_DOCHUB_MODE=plugin && vue-cli-service build",
@@ -28,14 +28,15 @@
     "postinstall": "find plugins -maxdepth 1 -type d -exec sh -c \"cd '{}' && if [ -f package.json ]; then npm install; fi\" \\;"
   },
   "dependencies": {
-    "@asyncapi/react-component": "1.0.0-next.44",
-    "@asyncapi/web-component": "0.24.23",
+    "@asyncapi/react-component": "2.3.4",
+    "@asyncapi/web-component": "2.3.4",
     "@mdi/font": "5.9.55",
     "@mermaid-js/mermaid-mindmap": "9.3.0",
     "ajv": "8.12.0",
     "ajv-formats": "2.1.1",
     "ajv-i18n": "4.2.0",
     "axios": "0.21.4",
+    "babel-runtime": "6.26.0",
     "core-js": "3.26.1",
     "dateformat": "3.0.3",
     "jsonata": "2.0.3",
@@ -47,7 +48,7 @@
     "oidc-client-ts": "2.4.0",
     "semver": "7.5.4",
     "stream": "0.0.2",
-    "swagger-ui": "3.52.5",
+    "swagger-ui": "5.17.14",
     "timers": "0.1.1",
     "uuid": "8.3.2",
     "vis-network": "9.1.2",
@@ -65,6 +66,7 @@
     "@babel/eslint-parser": "7.19.1",
     "@babel/preset-env": "7.20.2",
     "@babel/preset-typescript": "7.18.6",
+    "@babel/runtime": "7.25.7",
     "@effortlessmotion/html-webpack-inline-source-plugin": "1.0.3",
     "@types/jest": "29.4.1",
     "@typescript-eslint/eslint-plugin": "5.46.1",

@@ -111,6 +111,10 @@
       tocShow: {
         type: Boolean,
         default: true
+      },
+      inline: {
+        type: Boolean,
+        default: true
       }
     },
     data() {
@@ -177,7 +181,7 @@
       tocRendered(tocHTML) {
         // Не выводим оглавление, если в нем всего три раздела или меньше
         // eslint-disable-next-line no-useless-escape
-        if (this.tocShow && ((tocHTML.match(/\<li\>.*\<\/li\>/g) || []).length > 3))
+        if (!this.inline && this.tocShow && ((tocHTML.match(/\<li\>.*\<\/li\>/g) || []).length > 3))
           this.toc = tocHTML;
       },
       prepareMarkdown(content) {

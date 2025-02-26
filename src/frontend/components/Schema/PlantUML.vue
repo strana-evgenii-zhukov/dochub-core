@@ -117,7 +117,6 @@
     ],
     data() {
       return {
-        original: null,
         menu: { // Контекстное меню
           show: false,  // Признак отображения
           x : 0,  // Позиция x
@@ -145,18 +144,21 @@
         return this.svgEl;
       },
       viewBox() {
-        if (!this.svgEl) {
-          return {
-            x: 0,
-            y : 0,
-            width : 0,
-            height : 0
-          };
-        } else
-          return this.cacheViewBox ?
-            this.cacheViewBox
-            // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-            : this.cacheViewBox = this.svgEl.viewBox.baseVal;
+        if (this.cacheViewBox) return this.cacheViewBox;
+        let result = null;
+        if (navigator.userAgent.toLowerCase().includes('firefox')) {
+          // eslint-disable-next-line no-useless-escape
+          const regex = /<svg.*?viewBox=\"(-?(?:\d+(?:\.\d+)?|\.\d+)(?:e\d+)?)\s*(-?(?:\d+(?:\.\d+)?|\.\d+)(?:e\d+)?)\s*(-?(?:\d+(?:\.\d+)?|\.\d+)(?:e\d+)?)\s*(-?(?:\d+(?:\.\d+)?|\.\d+)(?:e\d+)?)\".*?>/;
+          const parsed = this.svg.match(regex);
+          parsed && (result = {
+            x: Number.parseFloat(parsed[1]),
+            y: Number.parseFloat(parsed[2]),
+            width: Number.parseFloat(parsed[3]),
+            height: Number.parseFloat(parsed[4])
+          });
+        } else if (this.svgEl) result = this.svgEl.viewBox.baseVal;
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        return result ? (this.cacheViewBox = result) : { x:0, y:0, width:0, height:0 };
       },
       menuItems() {
         const result = [].concat(this.contextMenu);
@@ -206,6 +208,7 @@
       },
       doResize() {
         if (!this.svgEl || !this.svgEl.clientWidth || !this.svgEl.clientHeight) return;
+        
         const originWidth = this.viewBox.width;
 
         if (this.$el.clientWidth > this.viewBox.width) {
@@ -226,17 +229,6 @@
         const offsetY = (this.$el.clientHeight - originHeight) / 2;
         this.viewBox.x -= offsetX;
         this.viewBox.y -= offsetY > 0 ? offsetY : 0;
-      },
-      saveOriginal() {
-        const originalHeight = this.viewBox.height * (this.svgEl.clientWidth / this.viewBox.width);
-        this.original = {
-          height: originalHeight,
-          viewBoxHeight: this.$el.clientHeight * this.viewBox.height / originalHeight
-        };
-      },
-      resetToDefault() {
-        this.viewBox.height = this.original.viewBoxHeight;
-        this.svgEl.style.height = this.original.height;
       },
       prepareSVG() {
         this.svgEl = this.$el.querySelectorAll('svg')[0];
