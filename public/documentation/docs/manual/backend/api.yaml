@@ -8,8 +8,18 @@ info:
     встраивания DocHub в свои производственные процессы.
     Подробнее тут http://dochub.info/docs/dochub.deployment
 servers:
-  - url: "http://localhost:3030/"
-    description: Локальный сервер
+  - url: https://{URL}
+    description: API server secure
+    variables:
+      URL:
+        default: localhost:3030
+        description: Сервер http для запроса
+  - url: http://{URL}
+    description: API server insecure
+    variables:
+      URL:
+        default: localhost:3030
+        description: Сервер https для запроса
 tags:
 - name: DataLake
   description: "API для доступа в озеро данных архитектуры"

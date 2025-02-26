@@ -38,12 +38,12 @@ export default {
             this.animation.information = null;
         },
         // Фокусирует линк диаграммы
-        animationActionFocusLink(from, to) {
+        async animationActionFocusLink(from, to) {
             const regexFrom = new RegExp(from);
             const regexTo = new RegExp(to);
             for (const track of this.presentation.tracks) {
-                if(regexFrom.test(track.link.from), regexTo.test(track.link.to))
-                  this.onTrackClick(track);
+                if(regexFrom.test(track.link.from) && regexTo.test(track.link.to))
+                  await this.onTrackClick(track);
             }
         },
         // Фокусирует объект диаграммы

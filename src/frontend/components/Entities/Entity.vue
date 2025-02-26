@@ -15,7 +15,6 @@
 </template>
 
 <script>
-
   /*
   Copyright (C) 2021 owner Roman Piontik R.Piontik@mail.ru
 

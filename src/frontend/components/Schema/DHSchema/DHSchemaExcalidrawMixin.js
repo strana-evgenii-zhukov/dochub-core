@@ -200,7 +200,7 @@ export default {
                         16,
                         14,
                         'left',
-                        group
+                        [group]
                     );
                 } else {
                     context.elements.push({
@@ -227,7 +227,7 @@ export default {
                         link: null,
                         locked: false,
                         status: 'saved',
-                        fileId: `0${box.node.symbol}`,
+                        fileId: `dh_${box.node.symbol}`,
                         scale: [1, 1]
                     });
 
@@ -241,7 +241,7 @@ export default {
                         16,
                         14,
                         'center',
-                        group
+                        [group]
                     );
                 }
             }
@@ -263,8 +263,8 @@ export default {
                     </svg>
                     `;
 
-                files[`0${symbol.id}`] = {
-                    id: symbol.id,
+                files[`dh_${symbol.id}`] = {
+                    id: `dh_${symbol.id}`,
                     mimeType: 'image/svg+xml',
                     dataURL: this.exdMakeSVGDataURL(svg),
                     created: now,

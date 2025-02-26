@@ -362,12 +362,12 @@ export default {
 
 			gateway.appendListener('source/changed', reloadSourceAll);
 		},
-    //парсим токен с ролями
-    setRolesFromToken(context){
-      console.log('ACTION.............');
-      context.commit('setAvailableRoles', {roles : {users: ['test']}});
+        //парсим токен с ролями
+        setRolesFromToken(context){
+        console.log('ACTION.............');
+        context.commit('setAvailableRoles', {roles : {users: ['test']}});
 
-    },
+        },
 		// Вызывается при необходимости получить access_token
 		refreshAccessToken(context, OAuthCode) {
 			const params = OAuthCode ? {
@@ -415,7 +415,7 @@ export default {
 
 		// Reload root manifest
 		async reloadRootManifest(_context, payload) {
-      console.log('reload root manifest');
+            console.log('reload root manifest');
 			// Если работаем в режиме backend, берем все оттуда
 			if (env.isBackendMode()) {
 				storageManager.onStartReload();
@@ -430,8 +430,11 @@ export default {
 
         // Reload root manifest
         reloadAll(context, payload) {
-
             context.dispatch('reloadRootManifest', payload);
+        },
+
+        clean(context) {
+            context.commit('clean');
         },
 
         // Reload root manifest

@@ -128,6 +128,7 @@
   max-width: calc(100% - 32px);
   display: inline-flex;
   left: 10px;
+  background: transparent !important;
 }
 
 

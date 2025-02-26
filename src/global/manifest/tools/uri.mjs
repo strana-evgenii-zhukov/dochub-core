@@ -42,7 +42,6 @@ export default function(config) {
 		return (uri.slice(0, window.origin.length) !== window.origin) && this.isURL(uri);
 	};
 	this.makeURIByBaseURI = (uri, baseURI) => {
-		// if (('' + uri).startsWith('gitlab:')) debugger;
 		let result;
 		// Анализируем URI
 		try {
