@@ -3,4 +3,3 @@ $package:
     version: 3.0.0
 imports:
   - root.yaml
-  - test/root.yaml
