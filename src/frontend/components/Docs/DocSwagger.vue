@@ -38,6 +38,7 @@
 
   import DocMixin from './DocMixin';
   import { getAsyncApiContext } from '@front/helpers/misc';
+  import env from '@front/helpers/env';
 
   export default {
     name: 'DocSwagger',
@@ -70,7 +71,7 @@
           SwaggerUI({
             dom_id: `#${this.dom_id}`,
             spec: this.data,
-            deepLinking: true,
+            deepLinking: !env.isPlugin(),
             docExpansion: this.isPrintVersion ? 'full' : 'list',
             presets: [
               SwaggerUI.presets.apis
