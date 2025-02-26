@@ -159,11 +159,15 @@ export default {
             return this.profile?.template;
         },
         baseURI() {
-            return uriTool.getBaseURIOfPath(this.path);
+            let result = uriTool.getBaseURIOfPath(this.path);
+            result?.startsWith('res://') && (result = requests.expandResourceURI(result));
+            return result;
         },
         url() {
             const contentBasePath = uriTool.getBaseURIOfPath(`${this.path}/${this.isTemplate ? 'template' : 'source'}`) || this.baseURI;
-            let result = this.profile ? uriTool.makeURIByBaseURI(this.profile.template || this.profile.source, contentBasePath).toString() : null;
+            let uri = this.profile.template || this.profile.source;
+            uri?.startsWith('res://') && (uri = requests.expandResourceURI(uri));
+            let result = this.profile ? uriTool.makeURIByBaseURI(uri, contentBasePath).toString() : null;
             if (!result) return null;
             result += result.indexOf('?') > 0 ? '&' : '?';
             result += `id=${this.id}&path=${encodeURI(this.path)}`;

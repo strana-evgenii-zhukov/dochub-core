@@ -192,7 +192,7 @@ export default {
 
     expandResourceURI(URI) {
         const url = new URL(URI);
-        const objectPath = url.pathname.slice(1);
+        const objectPath = `${url.hostname}${url.pathname}`;
         const subPath = this.encodeRelPath(url.hash.slice(1));
         const result = uriTool.makeURL(uriTool.makeURIByBaseURI(subPath, uriTool.getBaseURIOfPath(objectPath))).url;
         return result.toString();
