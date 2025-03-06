@@ -40,6 +40,8 @@ manifestParser.cache = cache;
 
 manifestParser.reloadManifest = async function(payload) {
   await manifestParser.startLoad();
+  // eslint-disable-next-line no-console
+  console.info('Metamodel URI is', env.uriMetamodel);
   if (payload) {
     await (
       async function parserImport(next = 0) {
@@ -75,14 +77,19 @@ manifestParser.reloadManifest = async function(payload) {
       }
 
       // Если корневой манифест указан загружаем
-      rootManifest
-        && await manifestParser.import(manifestParser.cache.makeURIByBaseURI(rootManifest, requests.getSourceRoot()));
+      if (rootManifest) {
+        const rootURI = manifestParser.cache.makeURIByBaseURI(rootManifest, requests.getSourceRoot());
+        // eslint-disable-next-line no-console
+        console.info('Root manifest URI is', rootURI);
+        await manifestParser.import(rootURI);
+      // eslint-disable-next-line no-console
+      } else console.warn('Root manifest is not defined');
     } else {
       /* Подключаем базовую метамодель */
       await manifestParser.import(manifestParser.cache.makeURIByBaseURI(env.uriMetamodel, requests.getSourceRoot()));
 
       const rootURI = manifestParser.cache.makeURIByBaseURI(env.rootManifest, requests.getSourceRoot());
-      console.info('Root file is', rootURI);
+      console.info('Root manifest URI is', rootURI);
       await manifestParser.import(rootURI);
 
       manifestParser.loaded = {};
