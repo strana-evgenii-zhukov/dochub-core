@@ -39,6 +39,8 @@ export default function(config) {
 	};
 
 	this.makeFileURI = (projectID, repositoryId, source, branch) => {
+    if (!config.bitbucket_server) throw new Error('Not defined Bitbucket server!');
+    if (!projectID || !repositoryId || !source || !branch) throw new Error(`incorrect Bitbucket URI to ${projectID}:${repositoryId}:${branch}@${source}!`);
 		const result = new URL(
 			`rest/api/1.0/projects/${projectID}/repos/${repositoryId}/raw/`
 			+ encodeURIComponent(source).split('%2F').join('/')

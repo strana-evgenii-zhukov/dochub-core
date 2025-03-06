@@ -81,16 +81,18 @@ manifestParser.reloadManifest = async function(payload) {
       /* Подключаем базовую метамодель */
       await manifestParser.import(manifestParser.cache.makeURIByBaseURI(env.uriMetamodel, requests.getSourceRoot()));
 
-      await manifestParser.import(
-        manifestParser.cache.makeURIByBaseURI(env.rootManifest, requests.getSourceRoot()));
+      const rootURI = manifestParser.cache.makeURIByBaseURI(env.rootManifest, requests.getSourceRoot());
+      console.info('Root file is', rootURI);
+      await manifestParser.import(rootURI);
 
       manifestParser.loaded = {};
     }
   }
+
   await manifestParser.checkAwaitedPackages();
   manifestParser.checkLoaded();
 
-  manifestParser.stopLoad();
+  setTimeout(() => manifestParser.stopLoad(), 100);
 };
 
 export default manifestParser;
