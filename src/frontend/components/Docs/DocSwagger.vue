@@ -98,7 +98,6 @@
           SwaggerUI({
             dom_id: `#${this.dom_id}`,
             url: ROOT_PATH,
-            // spec: this.data,
             deepLinking: !env.isPlugin(),
             docExpansion: this.isPrintVersion ? 'full' : 'list',
             presets: [
