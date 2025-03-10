@@ -39,7 +39,11 @@
   import DocMixin from './DocMixin';
   import { getAsyncApiContext } from '@front/helpers/misc';
   import env from '@front/helpers/env';
+  import requests from '@front/helpers/requests';
 
+  const ROOT_PATH_DEEP = 16;
+  const ROOT_PATH = 'http://null/$/$/$/$/$/$/$/$/$/$/$/$/$/$/$/$/$root';
+  
   export default {
     name: 'DocSwagger',
     mixins: [DocMixin],
@@ -66,16 +70,41 @@
         getAsyncApiContext.call(this, true);
       },
 
+      async proxy(url) {
+        let target = new URL(String(url));
+        const base = new URL(ROOT_PATH);
+        if (target.hostname !== base.hostname) return url;
+        let deep = target.pathname.split('$/').length - 1;
+        target = '../'.repeat(ROOT_PATH_DEEP - deep) + target.pathname.slice(deep * 2 + 1);
+        const response = await requests.request(target, this.url);
+        const data = new Blob([ response.data ], {type: response.headers?.['content-type'] || 'plain/text'});
+        return URL.createObjectURL(data);
+      },
+
+      async requestInterceptor(request) {
+        if (request.url === ROOT_PATH) {
+          const rootData = new Blob([typeof this.data === 'string' ? this.data : JSON.stringify(this.data) ], {type: 'application/json'});
+          return {
+            ...request,
+            url: URL.createObjectURL(rootData)
+          };
+        } else return {
+          ...request,
+          url: await this.proxy(request.url)
+        };
+      },
       swaggerRender() {
         if (this.url) {
           SwaggerUI({
             dom_id: `#${this.dom_id}`,
-            spec: this.data,
+            url: ROOT_PATH,
+            // spec: this.data,
             deepLinking: !env.isPlugin(),
             docExpansion: this.isPrintVersion ? 'full' : 'list',
             presets: [
               SwaggerUI.presets.apis
-            ]
+            ],
+            requestInterceptor: this.requestInterceptor
           });
         }
       }
