@@ -12,7 +12,7 @@
       <v-data-table
         v-bind:mobile-breakpoint="0"
         v-bind:headers="headers"
-        v-bind:items="source.dataset || []"
+        v-bind:items="items"
         v-bind:search="search"
         v-bind:items-per-page="itemsPerPage"
         v-bind:multi-sort="true"
@@ -107,6 +107,10 @@
     computed: {
       headers() {
         return this.profile?.headers || [];
+      },
+      items() {
+        const result = this.source.dataset || [];
+        return Array.isArray(result) ? result : [result];
       },
       perPage() {
         return (this.profile || {})['per-page'];

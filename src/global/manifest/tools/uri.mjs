@@ -138,6 +138,8 @@ export default function(config) {
 		} catch (e) {
 			// Если возникла ошибка, считаем путь относительным
 			if (!baseURI) {
+				// eslint-disable-next-line no-console
+				console.error(e);
 				// eslint-disable-next-line no-debugger
 				throw `Error in base URI ${uri}! Base URI is empty.`;
 			}

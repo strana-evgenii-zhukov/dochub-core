@@ -163,11 +163,13 @@ export default {
             result?.startsWith('res://') && (result = requests.expandResourceURI(result));
             return result;
         },
+        contentBasePath() {
+            return uriTool.getBaseURIOfPath(`${this.path}/${this.isTemplate ? 'template' : 'source'}`) || this.baseURI;
+        },
         url() {
-            const contentBasePath = uriTool.getBaseURIOfPath(`${this.path}/${this.isTemplate ? 'template' : 'source'}`) || this.baseURI;
             let uri = this.profile.template || this.profile.source;
             uri?.startsWith('res://') && (uri = requests.expandResourceURI(uri));
-            let result = this.profile ? uriTool.makeURIByBaseURI(uri, contentBasePath).toString() : null;
+            let result = this.profile ? uriTool.makeURIByBaseURI(uri, this.contentBasePath).toString() : null;
             if (!result) return null;
             result += result.indexOf('?') > 0 ? '&' : '?';
             result += `id=${this.id}&path=${encodeURI(this.path)}`;
