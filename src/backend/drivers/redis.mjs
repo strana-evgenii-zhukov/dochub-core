@@ -38,16 +38,12 @@ let client = null;
 export default async function() {
     if (client) return client;
     const url = process.env.VUE_APP_DOCHUB_REDIS_URL;
-    logger.log(`Creating Redis client with URL: ${url}`, LOG_TAG);
     client = url ? createClient({url}) : createClient();
     client.on('error', err => logger.error(`Error of redis client: ${err.toString()}`, LOG_TAG));
-    client.on('connect', () => logger.log('Redis client connected', LOG_TAG));
-    client.on('ready', () => logger.log('Redis client ready', LOG_TAG));
-    client.on('end', () => logger.log('Redis client connection ended', LOG_TAG));
     try {
-    await client.connect();
-    logger.log('Redis client is enabled', LOG_TAG);
-    return client;
+        await client.connect();
+        logger.log('Redis client is enabled', LOG_TAG);
+        return client;
     } catch (error) {
         logger.error(`Failed to connect to Redis: ${error.message}`, LOG_TAG);
         throw error;
