@@ -47,7 +47,17 @@ const __dirname = path.dirname(__filename);
 
 const cacheMode = (process.env.VUE_APP_DOCHUB_DATALAKE_CACHE || 'none').toLocaleLowerCase();
 
+logger.log(`Cache mode: ${cacheMode}`, LOG_TAG);
+
 const redisClient = cacheMode === 'redis' ? await createRedisClient() : null;
+
+if (cacheMode === 'redis') {
+    if (redisClient) {
+        logger.log('Redis client created successfully', LOG_TAG);
+    } else {
+        logger.log('Redis client creation failed', LOG_TAG);
+    }
+}
 
 export function loadFromAssets(filename) {
     const source = path.resolve(__dirname, '../../assets/' + filename);
@@ -86,9 +96,17 @@ export default Object.assign(prototype, {
         case 'none': return; 
         case 'memory': memoryCache = {}; break;
         case 'redis': 
+            if (!redisClient) {
+                logger.log('Redis client is not available, skipping Redis cache clear', LOG_TAG);
+                return;
+            }
+            try {
             // eslint-disable-next-line no-case-declarations
             const keys = await redisClient.keys(`DocHub.cache.${prefix || ''}.*`);
             keys.map((key) => redisClient.del(key));
+            } catch (redisError) {
+                logger.log(`Redis clear cache failed: ${redisError.message}`, LOG_TAG);
+            }
             break;
         default: {
           const cacheDir = path.resolve(__dirname, '../../../', cacheMode);
@@ -129,6 +147,7 @@ export default Object.assign(prototype, {
         try {
             let result = null;
             const md5Key = `DocHub.cache.${prefix || 'unknown'}.${md5(key)}`;
+            logger.log(`Generated cache key: ${md5Key}`, LOG_TAG);
             
             switch (cacheMode) {
                 case 'none': result = resolve && await resolve() || undefined; break;
@@ -136,12 +155,58 @@ export default Object.assign(prototype, {
                     || (resolve && (memoryCache[md5Key] = await resolve()));
                     break;
                 case 'redis': 
-                    result = await redisClient.get(md5Key);
-                    if (result) {
-                        result = JSON.parse(result);
+                    if (!redisClient) {
+                        // Fallback to memory cache if Redis client is not available
+                        logger.log('Redis client is not available, falling back to memory cache', LOG_TAG);
+                        result = memoryCache[md5Key] 
+                            || (resolve && (memoryCache[md5Key] = await resolve()));
                     } else {
-                        result = await resolve();
-                        await redisClient.set(md5Key, JSON.stringify(result));
+                        try {
+                            logger.log(`Attempting Redis GET for key: ${md5Key}`, LOG_TAG);
+                            result = await redisClient.get(md5Key);
+                            if (result) {
+                                result = JSON.parse(result);
+                                logger.log(`Redis GET successful, found cached data`, LOG_TAG);
+                            } else {
+                                logger.log(`Redis GET returned null, generating new data`, LOG_TAG);
+                                result = await resolve();
+                                logger.log(`Attempting Redis SET for key: ${md5Key}`, LOG_TAG);
+                                
+                                // Проверяем, что result не undefined
+                                if (result === undefined || result === null) {
+                                    logger.log(`Generated data is ${result}, skipping Redis cache`, LOG_TAG);
+                                    return res ? true : result;
+                                }
+                                
+                                let serializedResult;
+                                try {
+                                    serializedResult = JSON.stringify(result);
+                                } catch (jsonError) {
+                                    logger.error(`JSON serialization failed: ${jsonError.message}, falling back to memory cache`, LOG_TAG);
+                                    memoryCache[md5Key] = result;
+                                    return res ? true : result;
+                                }
+                                logger.log(`Data to store in Redis: ${serializedResult.length} characters`, LOG_TAG);
+                                
+                                // Проверяем размер данных (Redis имеет ограничение ~512MB на значение)
+                                if (serializedResult.length > 100 * 1024 * 1024) { // 100MB
+                                    logger.log(`Data too large for Redis cache: ${serializedResult.length} characters, falling back to memory cache`, LOG_TAG);
+                                    memoryCache[md5Key] = result;
+                                } else {
+                                    await redisClient.set(md5Key, serializedResult);
+                                }
+                                logger.log(`Redis SET successful`, LOG_TAG);
+                            }
+                        } catch (redisError) {
+                            // Fallback to memory cache if Redis operation fails
+                            logger.error(`Redis operation failed: ${redisError.message}, falling back to memory cache`, LOG_TAG);
+                            logger.error(`Redis error code: ${redisError.code}`, LOG_TAG);
+                            logger.error(`Redis error name: ${redisError.name}`, LOG_TAG);
+                            logger.error(`Redis error details: ${redisError.stack}`, LOG_TAG);
+                            logger.error(`Failed key: ${md5Key}`, LOG_TAG);
+                            result = memoryCache[md5Key] 
+                                || (resolve && (memoryCache[md5Key] = await resolve()));
+                        }
                     }
                     break;
                 default: {
