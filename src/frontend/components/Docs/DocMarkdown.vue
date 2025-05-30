@@ -213,6 +213,10 @@
               content = mustache.render(data, this.source.dataset);
             } else
               content = data;
+            // Извлекаем документ отделяя от метаданных если они есть
+            const parts = content.split('---');
+            if (parts.length === 3 && !parts[0])
+              content = content.split('---').pop(); 
             this.markdown = this.prepareMarkdown(content);
           }).catch((e) => {
             this.error = e;

@@ -41,7 +41,7 @@ import '../helpers/env.mjs';
 
 import jsonataDriver from '../../global/jsonata/driver.mjs';
 import jsonataFunctions from '../../global/jsonata/functions.mjs';
-import {newManifest, loader, isRolesMode, DEFAULT_ROLE} from "../utils/rules.mjs";
+import {newManifest, loader, isRolesMode, DEFAULT_ROLE} from '../utils/rules.mjs';
 
 const LOG_TAG = 'storage-manager';
 
@@ -96,7 +96,7 @@ export default {
 				for(let nRule in manifest?.roles) {
 					if(app.new_rules[rule] === nRule) {
 						mergeRules = mergeRules.concat(manifest?.roles[nRule]);
-						ids.push(nRule)
+						ids.push(nRule);
 					}
 				}
 			}
@@ -113,7 +113,7 @@ export default {
 		// Загрузку начинаем с виртуального манифеста
 		cache.errorClear();
 		let storageManifest = {};
-		let createManifest = async function() {
+		let createManifest = async() => {
 			await manifestParser.clean();
 			await manifestParser.startLoad();
 			await manifestParser.import('file:///$root$');
@@ -122,7 +122,7 @@ export default {
 			await manifestParser.stopLoad();
 		};
 
-		let createRoleManifest = async function () {
+		let createRoleManifest = async() => {
 			try {
 				// загружаю основной файл с ролями
 				const {URI} =  global.$roles;
@@ -139,9 +139,9 @@ export default {
 					storageManifest.manifests[role] = newManifest(storageManifest.manifests.origin, exclude, filters);
 				}
 			} catch (e) {
-				this.registerError(e, e.uri || uri);
+				this.registerError(e, e.uri);
 			}
-		}
+		};
 
 		await createManifest();
 
