@@ -32,7 +32,7 @@
 import * as semver from 'semver';
 import cache from './services/cache.mjs';
 import prototype from './prototype.mjs';
-
+import yaml from 'yaml';
 
 class PackageError extends Error {
 	constructor(uri, message) {
@@ -374,12 +374,18 @@ const parser = {
 	},
 
 	async import(uri) {
-		console.log('import.uri',uri);
+		console.log('import.uri', uri);
 		try {
 			const response = this.onPullSource 
 				? await this.onPullSource(uri, '/', this)
 				: await parser.cache.request(uri, '/');
-			const manifest = response && (typeof response.data === 'object'
+			let manifest;
+			if (uri.toLowerCase().endsWith('.md')) {
+				const parts = response.data.split('---');
+				if (parts.length === 1) manifest = {};
+				else if (parts.length !== 3) throw new Error('Incorrect metadata of markdown file');
+				else manifest = yaml.parse(parts[1]);
+			} else manifest = response && (typeof response.data === 'object'
 				? response.data
 				: JSON.parse(response.data));
 
