@@ -34,6 +34,7 @@
 import cache from './services/cache.mjs'; // Сервис управления кэшем
 import * as semver from 'semver'; // Управление версиями  
 import prototype from './prototype.mjs';
+import yaml from 'yaml';
 
 // Кладовка
 // https://github.com/douglascrockford/JSON-js
@@ -458,7 +459,12 @@ parser.pushRequest = function(uri, owner) {
         request.then((response) => {
             // Удаляем из загрузок ресурс
             delete parser.sourceLoading[uri];
-            success(response && (typeof response.data === 'object'
+            if (response.headers?.['content-type'].match(/^.*\/markdown($|;.*$)/)) {
+                const parts = response.data.split('---');
+                if (parts.length === 1) success({});
+                else if (parts.length !== 3) reject(new Error('Incorrect metadata of markdown file'));
+                else success(yaml.parse(parts[1]));
+            } else success(response && (typeof response.data === 'object'
                 ? response.data
                 : JSON.parse(response.data))
             );

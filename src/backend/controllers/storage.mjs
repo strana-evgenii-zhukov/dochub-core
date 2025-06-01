@@ -31,7 +31,7 @@ Contributors:
 import logger from '../utils/logger.mjs';
 import request from '../helpers/request.mjs';
 import {getRoles} from '../helpers/jwt.mjs';
-import {getCurrentRuleId, getCurrentRules} from "../utils/rules.mjs";
+import {getCurrentRuleId, getCurrentRules} from '../utils/rules.mjs';
 
 const LOG_TAG = 'controller-storage';
 
@@ -47,8 +47,8 @@ export default (app) => {
         const hash = req.params.hash || '$unknown$';
         const url = req.originalUrl.slice(`/core/storage/${hash}/`.length).replace(/\%E2\%86\%90/g, '..');
         //const url = decodeURIComponent(req.params.url);
-        const uri = url.split('?')[0];
         const baseURL = app.storage?.md5Map[hash];
+        const uri = url.split('?')[0] || baseURL;
         logger.log(`Request to storage ${req.originalUrl}`, LOG_TAG);
         if (!baseURL || !uri) {
             res.status(403).json({

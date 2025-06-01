@@ -168,6 +168,7 @@ export default {
         },
         url() {
             let uri = this.profile.template || this.profile.source;
+            if (uri === '.') uri = this.contentBasePath;
             uri?.startsWith('res://') && (uri = requests.expandResourceURI(uri));
             let result = this.profile ? uriTool.makeURIByBaseURI(uri, this.contentBasePath).toString() : null;
             if (!result) return null;
