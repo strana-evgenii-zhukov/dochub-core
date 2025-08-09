@@ -182,7 +182,10 @@ entities:
                   $direction := $.*.direction ? $.*.direction : "--";
                   $.*.links[$lookup($components, id)].(
                     $title := title ? title : contract;
-                    $title := contract ? ("[[/docs/" & contract & " " & $title & "]]") : $title;
+                    $title := $match(contract, /([a-zA-Z0-1]+\:.+)/) 
+                      ? ("[[" & contract & " " & $title & "]]") : (
+                        contract ? ("[[/docs/" & contract & " " & $title & "]]") : $title
+                      );
                     {
                       "from": $from,
                       "to": (id ? id : "undefined"),
