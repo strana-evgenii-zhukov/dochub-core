@@ -459,7 +459,28 @@ parser.pushRequest = function(uri, owner) {
         request.then((response) => {
             // Удаляем из загрузок ресурс
             delete parser.sourceLoading[uri];
-            if (response.headers?.['content-type'].match(/^.*\/markdown($|;.*$)/)) {
+            // Если имеем уже распарсенные данные работаем с ними
+            if (typeof response.data === 'object') {
+                success(response.data);
+            } else {
+                // Если нет, пытаемся разобраться в том, что к нам пришло
+                const ext = uri?.split('.').pop().toLocaleLowerCase(); // Получаем расширение файла
+                // Проверяем является ли файл yaml
+                if (ext === 'yaml' || ext === 'yml') success(yaml.parse(response.data));
+                // Проверяем является ли файл md
+                else if (ext === 'md' || ext === 'markdown') {
+                    const parts = response.data.split('---');
+                    if (parts.length === 1) success({});
+                    else if (parts.length !== 3) reject(new Error('Incorrect metadata of markdown file'));
+                    else success(yaml.parse(parts[1]));
+                }
+                // Все прочие пытаемся разобрать как JSON
+                else {
+                    success(JSON.parse(response.data));
+                }
+            }
+            /*
+            if (response.headers?.['content-type'].match(/^.*\/markdown($|;.*$)/) || uri?.slice(-3).toLocaleLowerCase() === '.md') {
                 const parts = response.data.split('---');
                 if (parts.length === 1) success({});
                 else if (parts.length !== 3) reject(new Error('Incorrect metadata of markdown file'));
@@ -468,6 +489,7 @@ parser.pushRequest = function(uri, owner) {
                 ? response.data
                 : JSON.parse(response.data))
             );
+            */
         }).catch(reject);
     });
 };
