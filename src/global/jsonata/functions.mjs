@@ -179,7 +179,7 @@ export default (queryDriver, functions) => {
                 );
             }
             const result = await func.executor.evaluate(input?.context);
-            func.funcs = input.funcs;
+            func.funcs = input?.funcs;
             return prepareResult(func, result);         // Проверяем результат на корректность
         };
     }
