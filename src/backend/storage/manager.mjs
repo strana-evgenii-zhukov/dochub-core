@@ -139,7 +139,9 @@ export default {
 					storageManifest.manifests[role] = newManifest(storageManifest.manifests.origin, exclude, filters);
 				}
 			} catch (e) {
-				this.registerError(e, e.uri);
+				// eslint-disable-next-line no-console
+				// issue-601
+				console.error(e, e.uri);
 			}
 		};
 
