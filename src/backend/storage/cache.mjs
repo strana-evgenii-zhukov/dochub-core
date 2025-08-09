@@ -86,9 +86,14 @@ export default Object.assign(prototype, {
         case 'none': return; 
         case 'memory': memoryCache = {}; break;
         case 'redis': 
+            if (!redisClient) return;
+            try {
             // eslint-disable-next-line no-case-declarations
             const keys = await redisClient.keys(`DocHub.cache.${prefix || ''}.*`);
             keys.map((key) => redisClient.del(key));
+            } catch (redisError) {
+                logger.error(`Redis clear cache failed: ${redisError.message}`, LOG_TAG);
+            }
             break;
         default: {
           const cacheDir = path.resolve(__dirname, '../../../', cacheMode);
@@ -136,12 +141,44 @@ export default Object.assign(prototype, {
                     || (resolve && (memoryCache[md5Key] = await resolve()));
                     break;
                 case 'redis': 
-                    result = await redisClient.get(md5Key);
-                    if (result) {
-                        result = JSON.parse(result);
+                    if (!redisClient) {
+                        // Fallback to memory cache if Redis client is not available
+                        result = memoryCache[md5Key] 
+                            || (resolve && (memoryCache[md5Key] = await resolve()));
                     } else {
-                        result = await resolve();
-                        await redisClient.set(md5Key, JSON.stringify(result));
+                        try {
+                            result = await redisClient.get(md5Key);
+                            if (result) {
+                                result = JSON.parse(result);
+                            } else {
+                                result = await resolve();
+                                
+                                // Проверяем, что result не undefined
+                                if (result === undefined || result === null) {
+                                    return res ? true : result;
+                                }
+                                
+                                let serializedResult;
+                                try {
+                                    serializedResult = JSON.stringify(result);
+                                } catch (jsonError) {
+                                    logger.error(`JSON serialization failed: ${jsonError.message}, falling back to memory cache`, LOG_TAG);
+                                    memoryCache[md5Key] = result;
+                                    return res ? true : result;
+                                }
+                                // Проверяем размер данных (Redis имеет ограничение ~512MB на значение)
+                                if (serializedResult.length > 100 * 1024 * 1024) { // 100MB
+                                    memoryCache[md5Key] = result;
+                                } else {
+                                    await redisClient.set(md5Key, serializedResult);
+                                }
+                            }
+                        } catch (redisError) {
+                            // Fallback to memory cache if Redis operation fails
+                            logger.error(`Redis operation failed: ${redisError.message}, falling back to memory cache`, LOG_TAG);
+                            result = memoryCache[md5Key] 
+                                || (resolve && (memoryCache[md5Key] = await resolve()));
+                        }
                     }
                     break;
                 default: {
@@ -155,8 +192,6 @@ export default Object.assign(prototype, {
             }
 
             if (res) {
-                console.log('__dirname', __dirname);
-                console.log('fileName', fileName);
                 if (fileName) {
                     res.setHeader('Content-Type', 'application/json').sendFile(fileName);
                 } else res.status(200).json(result);

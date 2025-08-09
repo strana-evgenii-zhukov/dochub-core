@@ -3,9 +3,9 @@ node_modules
 /cache
 /dist
 /vscode-dist
+/plugins
 /certs
 /gitlab
-/plugins
 /src/hidden
 /cache
 /public/temp
