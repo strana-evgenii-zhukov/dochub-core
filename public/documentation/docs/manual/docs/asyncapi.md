@@ -4,7 +4,7 @@
 [сайта](https://www.asyncapi.com/blog/understanding-asyncapis).
 
 ```yaml
-asyncapi: 2.0.0
+asyncapi: 3.0.0
 info:
   title: Account Service
   version: "1.0.0"

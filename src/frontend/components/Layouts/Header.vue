@@ -8,50 +8,51 @@
     style="z-index: 99">
     <div class="main-layout__header">
       <div class="main-layout__header__menu">
-    <i class="fa-solid fa-bug" />
-    <v-app-bar-nav-icon v-on:click="() => handleDrawer()">
-      <header-logo />
-    </v-app-bar-nav-icon>
-    <v-toolbar-title style="cursor: pointer" v-on:click="onLogoClick">DocHub</v-toolbar-title>
-    <v-btn v-if="isBackShow" icon v-on:click="back">
-      <v-icon>arrow_back</v-icon>
-    </v-btn>
-    <v-btn v-if="isBackShow" icon v-on:click="debug">
-      <v-icon>mdi-bug</v-icon>
-    </v-btn>
-    <v-btn v-if="isBackShow" icon v-on:click="refresh">
-      <v-icon>refresh</v-icon>
-    </v-btn>
-      </div>
-      <div v-if="isRolesMode" class="main-layout__header__menu">
-        <v-toolbar-title right offset-y style="cursor: pointer" v-on:click="loginout()">{{
-            user || 'Login'
-          }}
-        </v-toolbar-title>
-        <v-spacer />
-    <v-btn v-if="isCriticalError" icon title="Есть критические ошибки!" v-on:click="gotoProblems">
-      <v-icon class="material-icons blink" style="display: inline">error</v-icon>
-    </v-btn>
-    <v-btn v-if="gotoIconShow" icon title="Найти в коде" v-on:click="gotoCode">
-      <v-icon class="material-icons" style="display: inline">code</v-icon>
-    </v-btn>
-    <v-menu offset-y>
-      <template #activator="{ on, attrs }">
-        <v-btn icon v-bind="attrs" v-on="on">
-          <v-icon>mdi-dots-vertical</v-icon>
+        <i class="fa-solid fa-bug" />
+        <v-app-bar-nav-icon v-on:click="() => handleDrawer()">
+          <header-logo />
+        </v-app-bar-nav-icon>
+        <v-toolbar-title style="cursor: pointer" v-on:click="onLogoClick">DocHub</v-toolbar-title>
+        <v-btn v-if="isBackShow" icon v-on:click="back">
+          <v-icon>arrow_back</v-icon>
         </v-btn>
-      </template>
-      <v-list>
-        <v-list-item>
-          <v-checkbox v-model="isPrintVersion" />
-          <v-list-item-title>Версия для печати</v-list-item-title>
-        </v-list-item>
-        <v-list-item>
-          <v-list-item-title style="cursor: pointer;" v-on:click="doPrint">Печать</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-menu>
+        <v-btn v-if="isBackShow" icon v-on:click="debug">
+          <v-icon>mdi-bug</v-icon>
+        </v-btn>
+        <v-btn v-if="isBackShow" icon v-on:click="refresh">
+          <v-icon>refresh</v-icon>
+        </v-btn>
       </div>
+      <v-spacer />
+      <v-btn v-if="isCriticalError" icon title="Есть критические ошибки!" v-on:click="gotoProblems">
+        <v-icon class="material-icons blink" style="display: inline">error</v-icon>
+      </v-btn>
+      <v-btn v-if="gotoIconShow" icon title="Найти в коде" v-on:click="gotoCode">
+        <v-icon class="material-icons" style="display: inline">code</v-icon>
+      </v-btn>
+      <v-menu offset-y>
+        <template #activator="{ on, attrs }">
+          <v-btn icon v-bind="attrs" v-on="on">
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item>
+            <v-checkbox v-model="isPrintVersion" />
+            <v-list-item-title>Версия для печати</v-list-item-title>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-title style="cursor: pointer;" v-on:click="doPrint">Печать</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </div>
+    <div v-if="isRolesMode" class="main-layout__header__menu">
+      <v-toolbar-title right offset-y style="cursor: pointer" v-on:click="loginout()">
+        {{
+          user || 'Login'
+        }}
+      </v-toolbar-title>
     </div>
   </v-app-bar>
 </template>
@@ -112,8 +113,11 @@
       gotoIconShow() {
         return env.isPlugin() && this.$route.name === 'entities';
       },
+      isReloading() {
+        return this.$store.state.isReloading;
+      },
       isCriticalError() {
-        return !!(this.$store.state.problems || []).find((item) => item.critical);
+        return this.$store.state.criticalError;
       },
       isPrintVersion: {
         set(value) {
@@ -131,6 +135,12 @@
         get() {
           return this.$store.state.isFullScreenMode;
         }
+      }
+    },
+    watch: {
+      isReloading(value) {
+        // Если завершена загрузка и есть критические ошибки, сразу переходим на демонстрацию их пользователю
+        if (!value && this.isCriticalError) this.gotoProblems();
       }
     },
     mounted() {
@@ -186,10 +196,10 @@
       },
       loginout() {
         this.user ? oidcClient.logout() : oidcClient.login();
-        console.log("login/logout");
+        console.log('login/logout');
         this.user ? oidcClient.logout() : oidcClient.login().then(() => {
           window.Vuex.dispatch('setRolesFromToken');
-          console.log("call set roles from token");
+          console.log('call set roles from token');
         });
       }
     }

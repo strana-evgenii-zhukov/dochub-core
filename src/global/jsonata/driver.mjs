@@ -59,27 +59,39 @@ function wcard(id, template) {
 }
 
 function mergeDeep(sources) {
-    function mergeDeep(target, sources) {
-        function isObject(item) {
-            return (item && typeof item === 'object' && !Array.isArray(item));
-        }
+    function isObject(item) {
+        return (item && typeof item === 'object' && !Array.isArray(item));
+    }
+    function isArray(item) {
+        return Array.isArray(item);
+    }
 
+    function mergeDeep(target, sources) {
         if (!sources.length) return target;
         const source = sources.shift();
+        if (target === undefined) {
+            if (isArray(source)) target = [];
+            else if (isObject(source)) target = {};
+        }
 
-        if (isObject(target) && isObject(source)) {
+        if (isArray(target) && isArray(source)) {
+            target.push(...source);
+        } else if (isObject(target) && isObject(source)) {
             for (const key in source) {
-                if (isObject(source[key])) {
-                    if (!target[key]) Object.assign(target, { [key]: {} });
+                if (isArray(source[key])) {
+                    if (!isArray(target[key])) target[key] = [];
+                    mergeDeep(target[key], [source[key]]);
+                } else if (isObject(source[key])) {
+                    if (!isObject(target[key])) Object.assign(target, { [key]: {} });
                     mergeDeep(target[key], [source[key]]);
                 } else {
                     Object.assign(target, { [key]: source[key] });
                 }
             }
-        }
-        return mergeDeep(target, sources);
+        } else target = source;
+        return mergeDeep(target, [...sources]);
     }
-    return mergeDeep({}, sources);
+    return mergeDeep(undefined, sources);
 }
 
 function jsonSchema(schema) {

@@ -459,7 +459,28 @@ parser.pushRequest = function(uri, owner) {
         request.then((response) => {
             // Удаляем из загрузок ресурс
             delete parser.sourceLoading[uri];
-            if (response.headers?.['content-type'].match(/^.*\/markdown($|;.*$)/)) {
+            // Если имеем уже распарсенные данные работаем с ними
+            if (typeof response.data === 'object') {
+                success(response.data);
+            } else {
+                // Если нет, пытаемся разобраться в том, что к нам пришло
+                const ext = uri?.split('.').pop().toLocaleLowerCase(); // Получаем расширение файла
+                // Проверяем является ли файл yaml
+                if (ext === 'yaml' || ext === 'yml') success(yaml.parse(response.data));
+                // Проверяем является ли файл md
+                else if (ext === 'md' || ext === 'markdown') {
+                    const parts = response.data.split('---');
+                    if (parts.length === 1) success({});
+                    else if (parts.length !== 3) reject(new Error('Incorrect metadata of markdown file'));
+                    else success(yaml.parse(parts[1]));
+                }
+                // Все прочие пытаемся разобрать как JSON
+                else {
+                    success(JSON.parse(response.data));
+                }
+            }
+            /*
+            if (response.headers?.['content-type'].match(/^.*\/markdown($|;.*$)/) || uri?.slice(-3).toLocaleLowerCase() === '.md') {
                 const parts = response.data.split('---');
                 if (parts.length === 1) success({});
                 else if (parts.length !== 3) reject(new Error('Incorrect metadata of markdown file'));
@@ -468,6 +489,7 @@ parser.pushRequest = function(uri, owner) {
                 ? response.data
                 : JSON.parse(response.data))
             );
+            */
         }).catch(reject);
     });
 };
@@ -588,9 +610,12 @@ parser.onChange = async function(sources) {
         // Если слой входит в список изменений - перезагружаем его
         // eslint-disable-next-line no-console
         if (sources.indexOf(layer.uri) >= 0) {
-            // eslint-disable-next-line no-console
+            // Если эффект есть, то запускаем процесс обновления слоев
+            !isAffected && this.onStartReload && this.onStartReload();
+            // Признаем эффект
             isAffected = true;
             try {
+                // Перезагружаем затронутый слой
                 await layer.reload(layer.uri);
             } catch (e) {
                 this.registerError(e, e?.uri || layer.uri);
@@ -599,8 +624,7 @@ parser.onChange = async function(sources) {
     }
     // Если в данных есть изменения - перестраиваем слои
     if (isAffected) {
-        // Вызываем слушателя начала обновления данных в манифесте
-        this.onStartReload && this.onStartReload();
+        // Если эффект есть, то перестраиваем слои
         parser.rebuildLayers();
         // Вызываем слушателя окончания обновления данных в манифесте
         this.onReloaded && this.onReloaded(this);
