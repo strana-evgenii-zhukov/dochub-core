@@ -7,7 +7,7 @@
       xmlns:xlink="http://www.w3.org/1999/xlink"
       width="48px"
       height="48px"
-      viewBox="140 95 120 80"
+      viewBox="130 75 100 80"
       preserveAspectRatio="xMidYMid meet"
       color-interpolation-filters="sRGB"
       class="header-logo"
@@ -114,7 +114,7 @@
     padding: 4px;
     background: #fff;
     border-radius: 17px;
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
   }
 </style>
