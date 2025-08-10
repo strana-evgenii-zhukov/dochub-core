@@ -16,8 +16,7 @@
     </v-navigation-drawer>
     <plugin-init v-if="isNotInited" />
     <v-main v-else style="min-height:100%" class="router-view">
-      <problems v-if="isCriticalError" />
-      <router-view v-else />
+      <router-view />
     </v-main>
     <template v-if="isLoading">
       <div class="loading-splash" />
@@ -95,9 +94,6 @@
       },
       isNotInited() {
         return this.isPlugin && this.$store.state.notInited;
-      },
-      isCriticalError() {
-        return this.isPlugin && this.$store.state.criticalError;
       },
       navIsTemporary() {
         return this.$store.state.isPrintVersion;

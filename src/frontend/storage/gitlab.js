@@ -162,6 +162,11 @@ export default {
             let tickCounter = 0;
             let rulesContext = null;
 
+            function isDetectedCriticalError() {
+                return !Object.keys(context.state.manifest || {}).length
+                    || !![errors.syntax, errors.net, errors.package, errors.core].find(item => item?.critical);
+            }
+
             storageManager.onReloaded = (parser) => {
                 // eslint-disable-next-line no-console
                 console.info('TIME OF RELOAD SOURCES = ', (Number.parseFloat((Date.now() - tickCounter) / 1000)).toFixed(4));
@@ -178,9 +183,7 @@ export default {
                 // Обновляем манифест и фризим объекты
                 context.commit('setManifest', manifest);
                 context.commit('setSources', parser.mergeMap);
-                if (!Object.keys(context.state.manifest || {}).length) {
-                    context.commit('setCriticalError', true);
-                }
+                context.commit('setCriticalError', isDetectedCriticalError());
 
                 entities(manifest);
                 context.commit('setIsReloading', false);
@@ -216,7 +219,7 @@ export default {
             storageManager.onError = (action, data) => {
                 errors.count++;
                 const error = data.error || {};
-                const url = (data.error.config || { url: data.uri }).url;
+                const url = (data.error.config || { url: data.uri }).url?.toString();
                 const uid = '$' + crc16(url);
                 if (action === 'core') {
                     if (!errors.core) {
@@ -278,7 +281,8 @@ export default {
 
                     item.description = `${error.toString()}\n`;
                     errors.package.items.push(item);
-                } else if (data.uri === consts.plugin.ROOT_MANIFEST || action === 'file-system') {
+                    
+                } else if (url === consts.plugin.ROOT_MANIFEST || action === 'file-system') { // Если ошибка непосредственного в корневом файле, устанавливаем признак проблемы корневого файла
                     context.commit('setNoInited', true);
                 } else {
                     const item = {
