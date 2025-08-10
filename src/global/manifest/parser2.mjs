@@ -610,9 +610,12 @@ parser.onChange = async function(sources) {
         // Если слой входит в список изменений - перезагружаем его
         // eslint-disable-next-line no-console
         if (sources.indexOf(layer.uri) >= 0) {
-            // eslint-disable-next-line no-console
+            // Если эффект есть, то запускаем процесс обновления слоев
+            !isAffected && this.onStartReload && this.onStartReload();
+            // Признаем эффект
             isAffected = true;
             try {
+                // Перезагружаем затронутый слой
                 await layer.reload(layer.uri);
             } catch (e) {
                 this.registerError(e, e?.uri || layer.uri);
@@ -621,8 +624,7 @@ parser.onChange = async function(sources) {
     }
     // Если в данных есть изменения - перестраиваем слои
     if (isAffected) {
-        // Вызываем слушателя начала обновления данных в манифесте
-        this.onStartReload && this.onStartReload();
+        // Если эффект есть, то перестраиваем слои
         parser.rebuildLayers();
         // Вызываем слушателя окончания обновления данных в манифесте
         this.onReloaded && this.onReloaded(this);
